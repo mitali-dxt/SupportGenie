@@ -8,10 +8,11 @@ export default function Home() {
       content:'Hi, I am SupportGenie of Headstarter AI, how can I help you today?',
     });
     const [message,setMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false)
 
     const sendMessage = async () => {
-      if (!message.trim()) return;  // Don't send empty messages
-    
+      if (!message.trim() || isLoading) return;
+      setIsLoading(true);
       setMessage('')
       setMessages((messages) => [
         ...messages,
@@ -31,6 +32,7 @@ export default function Home() {
         if (!response.ok) {
           throw new Error('Network response was not ok')
         }
+        // Remove the closing curly brace
     
         const reader = response.body.getReader()
         const decoder = new TextDecoder()
@@ -55,6 +57,7 @@ export default function Home() {
           { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
         ])
       }
+      setIsLoading(false)
     }
     
       // Send the message to the server
@@ -86,6 +89,12 @@ export default function Home() {
           return reader.read().then(processText)  // Continue reading the next chunk of the response
         })
       })
+
+    const handleKeyPress = (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault()
+        sendMessage()
+      }
     }
 
     return (
@@ -136,17 +145,23 @@ export default function Home() {
             ))}
           </Stack>
           <Stack direction={'row'} spacing={2}>
-            <TextField
-              label="Message"
-              fullWidth
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            <Button variant="contained" onClick={sendMessage}>
-              Send
-            </Button>
-          </Stack>
+          <TextField
+            label="Message"
+            fullWidth
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={isLoading}
+          />
+          <Button 
+            variant="contained" 
+            onClick={sendMessage}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Sending...' : 'Send'}
+          </Button>
+        </Stack>
         </Stack>
       </Box>
     )
-}
+  }
