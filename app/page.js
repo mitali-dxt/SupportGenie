@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import {Box, Stack, TextField, Button} from '@mui/material';
 
 export default function Home() {
     const messagesEndRef = useRef(null)
-    const [messages, setMessages] = useState({
+    const [messages, setMessages] = useState([
+      {
       role:'assistant',
       content:'Hi, I am SupportGenie of Headstarter AI, how can I help you today?',
-    });
+    }]);
     const [message,setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false)
 
