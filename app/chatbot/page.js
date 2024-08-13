@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from "react";
-import { Box, Stack, TextField, Button, Typography, createTheme, ThemeProvider } from '@mui/material';
+import { Box, Stack, TextField, Button, Typography, createTheme, ThemeProvider, useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/firebase'; // Import your Firebase configuration
+import { auth } from '@/firebase'; 
 
 export default function Chatbot() {
   const router = useRouter();
@@ -18,7 +18,6 @@ export default function Chatbot() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated, if not redirect to login page
     if (!auth.currentUser) {
       router.push('/login');
     }
@@ -88,16 +87,19 @@ export default function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
-  // Define a custom theme for the chat interface
+  const finishConversation = () => {
+    router.push('/feedback');
+  };
+
   const theme = createTheme({
     components: {
       MuiButton: {
         styleOverrides: {
           contained: {
-            backgroundColor: 'black', // Background color
-            color: 'white', // Text color
+            backgroundColor: 'black', 
+            color: 'white', 
             '&:hover': {
-              backgroundColor: '#333', // Background color on hover
+              backgroundColor: '#333', 
             },
           },
         },
@@ -113,6 +115,8 @@ export default function Chatbot() {
     },
   });
 
+  const isMobile = useMediaQuery('(max-width:600px)');
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -122,30 +126,29 @@ export default function Chatbot() {
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
-        bgcolor="#F2EFE4" // Background color
+        bgcolor="#F2EFE4" 
+        p={2}
       >
         <Stack
           direction={'column'}
-          width="500px"
-          height="700px"
+          width={isMobile ? '100%' : '500px'}
+          height={isMobile ? '90%' : '700px'}
           border="1px solid #ccc"
           borderRadius={8}
           p={2}
           spacing={2}
           bgcolor="white"
           boxShadow={3}
+          overflow="hidden"
         >
-          {/* Header Section */}
           <Box mb={2} textAlign="center">
-            <Typography variant="h4" fontWeight="bold" mb={1}>
+            <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold" mb={1}>
               SupportGenie
             </Typography>
-            <Typography variant="body2">
+            <Typography variant={isMobile ? "body2" : "body1"}>
               How can I assist you today?
             </Typography>
           </Box>
-
-          {/* Messages Section */}
           <Stack
             direction={'column'}
             spacing={2}
@@ -164,13 +167,16 @@ export default function Chatbot() {
                 <Box
                   bgcolor={
                     message.role === 'assistant'
-                      ? '#f0f0f0' // Light gray for assistant messages
-                      : '#28a745' // Green for user messages
+                      ? '#f0f0f0' 
+                      : '#28a745'
                   }
                   color="black"
                   borderRadius={16}
                   p={2}
                   maxWidth="80%"
+                  sx={{
+                    wordBreak: 'break-word',
+                  }}
                 >
                   {message.content}
                 </Box>
@@ -179,8 +185,7 @@ export default function Chatbot() {
             <div ref={messagesEndRef} />
           </Stack>
 
-          {/* Input Area */}
-          <Stack direction={'row'} spacing={2}>
+          <Stack direction={'column'} spacing={2}>
             <TextField
               label="Message"
               placeholder="Ask me anything..."
@@ -189,15 +194,31 @@ export default function Chatbot() {
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               disabled={isLoading}
+              sx={{ 
+                bgcolor: 'white',
+                borderRadius: 8 
+              }}
             />
-            <Button
-              variant="contained"
-              onClick={sendMessage}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Sending...' : 'Send'}
-            </Button>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="contained"
+                onClick={sendMessage}
+                disabled={isLoading}
+                fullWidth
+              >
+                {isLoading ? 'Sending...' : 'Send'}
+              </Button>
+            </Stack>
           </Stack>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={finishConversation}
+            sx={{ mt: 2 }}
+            fullWidth
+          >
+            End Conversation
+          </Button>
         </Stack>
       </Box>
     </ThemeProvider>
