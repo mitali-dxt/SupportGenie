@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
+import Groq from "groq-sdk";
 
 const systemPrompt =`You are SupportGenie, the customer support bot for Headstarter AI, a platform dedicated to helping users prepare for software engineering jobs through AI-driven interviews and project assistance. Your role is to provide friendly, accurate, and efficient support to users, helping them with any questions or issues they may have regarding the platform's features, interview preparation, project guidance, account management, and more.
 Key Guidelines:
@@ -17,20 +17,17 @@ Escalate unresolved issues to the appropriate support team.
 Be proactive in offering additional resources or tips based on user queries.
 Keep responses concise, informative, and easy to understand.`;
 
-export async function POST(req){
-    const openai = new OpenAI(process.env.OPENAI_API_KEY);
-    const data = await req.json();
-    const completion = await openai.chat.completions.create({
-        messages:[
-            {
-                role: "system",
-                content: systemPrompt,
-            },
-            ...data,
-        ],
-        model: "gpt-3.5-turbo",
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+export async function POST(req) {
+    const groq = new Groq()
+    const data = await req.json()
+
+    const completion = await groq.chat.completions.create({
+        model: 'llama3-8b-8192',
+        messages: [{ role: 'system', content: systemPrompt}, ...data],
         stream: true,
-    })
+    });
 
     const stream = new ReadableStream({
         async start(controller){
