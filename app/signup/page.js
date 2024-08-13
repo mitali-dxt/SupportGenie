@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { TextField, Button, Box, Typography } from '@mui/material';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebase'; // Adjust the import path based on your project structure
+import Image from 'next/image'; // Use Next.js Image component for better performance
 
 export default function SignupPage() {
   const router = useRouter();
@@ -15,8 +16,8 @@ export default function SignupPage() {
   const handleSignup = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      // Redirect to login page after successful signup
-      router.push('/login');
+      // Redirect to login page or main chat page after successful signup
+      router.push('/login'); // Redirect to login after signup
     } catch (error) {
       setError('Failed to sign up. Please try again.');
     }
@@ -30,6 +31,7 @@ export default function SignupPage() {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
+      bgcolor="#F2EFE4" // Background color
     >
       <Box
         width="400px"
@@ -39,14 +41,41 @@ export default function SignupPage() {
         boxShadow={3}
         textAlign="center"
       >
-        <Typography variant="h5" mb={3}>
-          Sign Up
+        {/* Chatbot Image */}
+        <Box mb={3}>
+          <Image
+            src="/chatbot.png" // Path to the image in public folder
+            alt="Chatbot"
+            width={100} // Adjust width as needed
+            height={100} // Adjust height as needed
+          />
+        </Box>
+
+        {/* Welcome Text */}
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          fontSize="1.5rem"
+          mb={2}
+        >
+          Welcome to SupportGenie
         </Typography>
+        <Typography
+          variant="body1"
+          fontWeight="bold"
+          mb={3}
+        >
+          Create a free SupportGenie account and ignite your curiosity!
+        </Typography>
+
+        {/* Error Message */}
         {error && (
           <Typography color="error" mb={2}>
             {error}
           </Typography>
         )}
+
+        {/* Signup Form */}
         <TextField
           label="Email"
           fullWidth
@@ -63,24 +92,21 @@ export default function SignupPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={handleSignup}
-          sx={{ mt: 3 }}
-        >
-          Sign Up
-        </Button>
-        <Typography mt={2}>
-          Already have an account?{' '}
-          <Button
-            variant="text"
-            color="primary"
-            onClick={() => router.push('/login')}
-          >
-            Log In
-          </Button>
-        </Typography>
+            variant="contained"
+            fullWidth
+            onClick={handleSignup}
+            sx={{
+                mt: 3,
+                bgcolor: 'black', // Background color
+                color: 'white', // Text color
+                '&:hover': {
+                bgcolor: '#333', // Background color on hover (dark grey)
+                },
+            }}
+            >
+            Sign Up
+            </Button>
+
       </Box>
     </Box>
   );
