@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { TextField, Button, Box, Typography } from '@mui/material';
+import { TextField, Button, Box, Typography, createTheme, ThemeProvider, Link } from '@mui/material';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebase'; // Adjust the import path based on your project structure
 import Image from 'next/image'; // Use Next.js Image component for better performance
@@ -23,7 +23,24 @@ export default function SignupPage() {
     }
   };
 
+    const theme = createTheme({
+        components: {
+        MuiButton: {
+            styleOverrides: {
+            containedPrimary: {
+                backgroundColor: 'black', // Background color
+                color: 'white', // Text color
+                '&:hover': {
+                backgroundColor: '#333', // Background color on hover
+                },
+            },
+            },
+        },
+        },
+    });
+
   return (
+    <ThemeProvider theme={theme}>
     <Box
       width="100vw"
       height="100vh"
@@ -91,23 +108,26 @@ export default function SignupPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button
+         <Button
             variant="contained"
+            color="primary"
             fullWidth
             onClick={handleSignup}
-            sx={{
-                mt: 3,
-                bgcolor: 'black', // Background color
-                color: 'white', // Text color
-                '&:hover': {
-                bgcolor: '#333', // Background color on hover (dark grey)
-                },
-            }}
-            >
+            sx={{ mt: 3 }}
+          >
             Sign Up
-            </Button>
-
+          </Button>
+            {/* Already have an account? Link */}
+          <Box mt={3}>
+            <Typography variant="body2">
+              Already have an account?{' '}
+              <Link href="/login" underline="hover" color="primary">
+                Login
+              </Link>
+            </Typography>
+          </Box>
       </Box>
     </Box>
+    </ThemeProvider>
   );
 }

@@ -1,8 +1,7 @@
-// app/chatbot/page.js
 'use client';
 
 import { useState, useRef, useEffect } from "react";
-import { Box, Stack, TextField, Button } from '@mui/material';
+import { Box, Stack, TextField, Button, Typography, createTheme, ThemeProvider } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase'; // Import your Firebase configuration
 
@@ -89,32 +88,72 @@ export default function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
+  // Define a custom theme for the chat interface
+  const theme = createTheme({
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          contained: {
+            backgroundColor: 'black', // Background color
+            color: 'white', // Text color
+            '&:hover': {
+              backgroundColor: '#333', // Background color on hover
+            },
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            backgroundColor: 'white',
+            borderRadius: 8,
+          },
+        },
+      },
+    },
+  });
+
   return (
-    <Box
-      width="100vw"
-      height="100vh"
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Stack
-        direction={'column'}
-        width="500px"
-        height="700px"
-        border="1px solid black"
-        p={2}
-        spacing={3}
+    <ThemeProvider theme={theme}>
+      <Box
+        width="100vw"
+        height="100vh"
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        bgcolor="#F2EFE4" // Background color
       >
         <Stack
           direction={'column'}
+          width="500px"
+          height="700px"
+          border="1px solid #ccc"
+          borderRadius={8}
+          p={2}
           spacing={2}
-          flexGrow={1}
-          overflow="auto"
-          maxHeight="100%"
+          bgcolor="white"
+          boxShadow={3}
         >
-          {
-            messages.map((message, index) => (
+          {/* Header Section */}
+          <Box mb={2} textAlign="center">
+            <Typography variant="h4" fontWeight="bold" mb={1}>
+              SupportGenie
+            </Typography>
+            <Typography variant="body2">
+              How can I assist you today?
+            </Typography>
+          </Box>
+
+          {/* Messages Section */}
+          <Stack
+            direction={'column'}
+            spacing={2}
+            flexGrow={1}
+            overflow="auto"
+            maxHeight="100%"
+          >
+            {messages.map((message, index) => (
               <Box
                 key={index}
                 display="flex"
@@ -125,38 +164,42 @@ export default function Chatbot() {
                 <Box
                   bgcolor={
                     message.role === 'assistant'
-                      ? 'primary.main'
-                      : 'secondary.main'
+                      ? '#f0f0f0' // Light gray for assistant messages
+                      : '#28a745' // Green for user messages
                   }
-                  color="white"
+                  color="black"
                   borderRadius={16}
-                  p={3}
+                  p={2}
+                  maxWidth="80%"
                 >
                   {message.content}
                 </Box>
               </Box>
-            ))
-          }
-          <div ref={messagesEndRef} />
+            ))}
+            <div ref={messagesEndRef} />
+          </Stack>
+
+          {/* Input Area */}
+          <Stack direction={'row'} spacing={2}>
+            <TextField
+              label="Message"
+              placeholder="Ask me anything..."
+              fullWidth
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={isLoading}
+            />
+            <Button
+              variant="contained"
+              onClick={sendMessage}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Sending...' : 'Send'}
+            </Button>
+          </Stack>
         </Stack>
-        <Stack direction={'row'} spacing={2}>
-          <TextField
-            label="Message"
-            fullWidth
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isLoading}
-          />
-          <Button 
-            variant="contained" 
-            onClick={sendMessage}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Sending...' : 'Send'}
-          </Button>
-        </Stack>
-      </Stack>
-    </Box>
+      </Box>
+    </ThemeProvider>
   );
 }
