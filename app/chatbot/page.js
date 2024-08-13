@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Box, Stack, TextField, Button, Typography, createTheme, ThemeProvider, useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/firebase'; 
+import { auth } from '@/firebase';
 
 export default function Chatbot() {
   const router = useRouter();
@@ -16,6 +16,7 @@ export default function Chatbot() {
   ]);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     if (!auth.currentUser) {
